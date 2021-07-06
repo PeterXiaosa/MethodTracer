@@ -1,0 +1,4 @@
+include ':monitor'
+include ':plugin'
+include ':app'
+rootProject.name = "KotlinApp"

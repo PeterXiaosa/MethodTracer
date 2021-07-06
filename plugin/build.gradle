@@ -1,0 +1,61 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'kotlin'
+
+sourceSets {
+    main {
+        groovy {
+            srcDir 'src/main/groovy'
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
+    }
+}
+
+dependencies {
+    implementation(gradleApi())
+
+    implementation(localGroovy())
+
+    implementation("org.ow2.asm:asm:6.0")
+    implementation("org.ow2.asm:asm-commons:6.0")
+    implementation("org.ow2.asm:asm-analysis:6.0")
+    implementation ("org.ow2.asm:asm-util:6.0")
+    implementation ("org.ow2.asm:asm-tree:6.0")
+
+    compileOnly 'com.android.tools.build:gradle:3.4.1', {
+        exclude group:'org.ow2.asm'
+    }
+}
+
+repositories {
+    jcenter()
+}
+
+// 配置了sourceSets，才会读取到两个src 目录
+//sourceSets {
+//    main {
+//        groovy {
+//            srcDir '../plugin/src/main/groovy'
+//        }
+//
+//        java {
+//            srcDir '../plugin/src/main/java'
+//        }
+//
+//        resources {
+//            srcDir '../plugin/src/main/resources'
+//        }
+//    }
+//}
+
+uploadArchives {
+    repositories.mavenDeployer {
+        repository(url: uri('../repo'))
+
+        pom.groupId = 'com.peter'
+        pom.artifactId = 'methodtracer'
+        pom.version = '1.0.0'
+    }
+}
