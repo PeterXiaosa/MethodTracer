@@ -3,7 +3,7 @@ plugins {
     id 'kotlin-android'
 }
 
-//apply plugin : 'com.peter.trace'
+//apply plugin : 'com.peter.methodtracer'
 
 android {
     compileSdkVersion 29
@@ -48,10 +48,10 @@ dependencies {
 }
 
 // 插件上传之后，使用插件时才apply 和 打开这些配置
-//apply plugin: "com.peter.methodtracer"
-//
-//MethodTracer {
-//    open = true
-//    logTraceInfo = true
-//    traceConfigFile = "${project.projectDir}/traceconfig.txt"
-//}
+apply plugin: "com.peter.methodtracer"
+
+MethodTracer {
+    open = true
+    logTraceInfo = true
+    traceConfigFile = "${project.projectDir}/traceconfig.txt"
+}

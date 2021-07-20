@@ -11,7 +11,6 @@ import com.android.build.api.transform.TransformInput
 import com.android.build.api.transform.TransformInvocation
 import com.android.build.api.transform.TransformOutputProvider
 import com.android.build.gradle.internal.pipeline.TransformManager
-import groovy.io.FileType
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
@@ -27,7 +26,7 @@ import java.util.jar.JarOutputStream
 import java.util.zip.ZipEntry
 import static org.objectweb.asm.ClassReader.EXPAND_FRAMES
 
-import com.peter.plugin.Config
+//import com.peter.plugin.Config
 
 /**
  * @author Peter Fu
@@ -42,7 +41,7 @@ class AnalyticsTransform extends Transform{
 
     @Override
     String getName() {
-        return "BlockMonitor"
+        return "BlockMonitor0720"
     }
 
     @Override
@@ -70,7 +69,8 @@ class AnalyticsTransform extends Transform{
             outputProvider.deleteAll()
         }
 
-        println('[MethodTracer] : transform()')
+        println '******************* [MethodTracer] : transform() **********************************'
+
         MethodTracerConfig methodTracerConfig = project.MethodTracer
         String output = methodTracerConfig.output
         if (output == null || output.isEmpty()) {
@@ -103,7 +103,8 @@ class AnalyticsTransform extends Transform{
                 if (traceConfig.isNeedTraceClass(name)) {
                     ClassReader classReader = new ClassReader(file.bytes)
                     ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS)
-                    ClassVisitor cv = new TraceClassVisitor(Opcodes.ASM5, classWriter, traceConfig)
+//                    ClassVisitor cv = new TraceClassVisitor(Opcodes.ASM5, classWriter, traceConfig)
+                    ClassVisitor cv = new TraceClassVisitor(Opcodes.ASM6, classWriter, traceConfig)
                     classReader.accept(cv, EXPAND_FRAMES)
                     byte[] code = classWriter.toByteArray()
                     FileOutputStream fos = new FileOutputStream(
@@ -149,7 +150,8 @@ class AnalyticsTransform extends Transform{
                     jarOutputStream.putNextEntry(zipEntry)
                     ClassReader classReader = new ClassReader(IOUtils.toByteArray(inputStream))
                     ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS)
-                    ClassVisitor cv = new TraceClassVisitor(Opcodes.ASM5, classWriter, traceConfig)
+//                    ClassVisitor cv = new TraceClassVisitor(Opcodes.ASM5, classWriter, traceConfig)
+                    ClassVisitor cv = new TraceClassVisitor(Opcodes.ASM6, classWriter, traceConfig)
                     classReader.accept(cv, EXPAND_FRAMES)
                     byte[] code = classWriter.toByteArray()
                     jarOutputStream.write(code)

@@ -2,10 +2,15 @@
 -tracepackage 
 
 #在需插桩的包下设置无需插桩的包(Setting up traceless packages under packages that require trace)
-#-keeppackage 
+-keeppackage com/peter/monitor
+-keeppackage android/support
+-keeppackage androidx
+-keeppackage kotlin
+-keeppackage kotlinx
+-keeppackage com/google
 
 #在需插桩的包下设置无需插桩的类(Setting up traceless classes under packages that require trace)
-#-keepclass 
+-keepclass 
 
 #插桩代码所在类,这里固定配置为：cn/cxzheng/tracemanui/TraceMan
 -beatclass com/peter/monitor/MethodTrace

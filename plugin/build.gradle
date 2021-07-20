@@ -1,6 +1,8 @@
 apply plugin: 'groovy'
 apply plugin: 'maven'
+
 apply plugin: 'kotlin'
+apply plugin: 'kotlin-android-extensions'
 
 sourceSets {
     main {
@@ -9,6 +11,9 @@ sourceSets {
         }
         resources {
             srcDir 'src/main/resources'
+        }
+        kotlin {
+            srcDir 'src/main/kotlin'
         }
     }
 }
@@ -29,26 +34,14 @@ dependencies {
     }
 }
 
+compileGroovy {
+    dependsOn tasks.getByPath('compileKotlin')
+    classpath += files(compileKotlin.destinationDir)
+}
+
 repositories {
     jcenter()
 }
-
-// 配置了sourceSets，才会读取到两个src 目录
-//sourceSets {
-//    main {
-//        groovy {
-//            srcDir '../plugin/src/main/groovy'
-//        }
-//
-//        java {
-//            srcDir '../plugin/src/main/java'
-//        }
-//
-//        resources {
-//            srcDir '../plugin/src/main/resources'
-//        }
-//    }
-//}
 
 uploadArchives {
     repositories.mavenDeployer {
