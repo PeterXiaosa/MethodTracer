@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
+import com.peter.monitor.MethodTrace
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,7 +18,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         findViewById<Button>(R.id.btn_click).setOnClickListener {
-            Toast.makeText(applicationContext, "Test", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(applicationContext, "Test", Toast.LENGTH_SHORT).show()
+            MethodTrace.startCollectMethodCost()
+        }
+
+        findViewById<Button>(R.id.btn_click2).setOnClickListener {
+            Thread.sleep(2000)
         }
     }
 

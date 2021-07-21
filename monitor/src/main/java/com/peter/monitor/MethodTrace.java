@@ -18,31 +18,35 @@ import java.util.List;
  * @date 2021/7/2
  */
 public class MethodTrace {
-    private static List<Entity> methodList = new LinkedList<>();
+    private final static String TAG = "MethodTrace";
+    private static final List<Entity> methodList = new LinkedList<>();
+
+    private final static long COST_TIME = 1000L;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public static void start(String name) {
-//        if (isOpenTraceMethod()) {
-            Trace.beginSection(name);
-            synchronized (methodList) {
-                methodList.add(new Entity(name, System.currentTimeMillis(), true, isInMainThread()));
-            }
-        Log.d("MethodTrace", "method Name : " + name);
-//        }
+        Trace.beginSection(name);
+        synchronized (methodList) {
+            methodList.add(new Entity(name, System.currentTimeMillis(), true, isInMainThread()));
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public static void end(String name) {
-//        if (isOpenTraceMethod()) {
-//            LogUtil.detail("执行了方法:" + name);
-            Trace.endSection();
-            synchronized (methodList) {
-                methodList.add(new Entity(name, System.currentTimeMillis(), false, isInMainThread()));
-            }
-//        }
+        Trace.endSection();
+        synchronized (methodList) {
+            methodList.add(new Entity(name, System.currentTimeMillis(), false, isInMainThread()));
+        }
     }
 
     public static void startCollectMethodCost() {
+        List<MethodInfo> list = obtainMethodCostData();
+        for (MethodInfo info : list) {
+            if (info.getCostTime() > COST_TIME) {
+                Log.d("MethodTrace", " \n【***************************************************\n method Name : " + info.getName() + ", \n cost time : " + info.getCostTime() + "ms"
+                        + "\n ***************************************************】");
+            }
+        }
         resetTraceManData();
     }
 
@@ -60,7 +64,7 @@ public class MethodTrace {
                 startEntity.pos = i;
                 Entity endEntity = findEndEntity(startEntity.name, i + 1);
 
-                if (startEntity != null && endEntity != null && endEntity.time - startEntity.time > 0) {
+                if (endEntity != null && endEntity.time - startEntity.time > 0) {
                     resultList.add(createMethodInfo(startEntity, endEntity));
                 }
             }
