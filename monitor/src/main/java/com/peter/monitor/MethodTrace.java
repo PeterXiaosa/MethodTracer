@@ -3,6 +3,7 @@ package com.peter.monitor;
 import android.os.Build;
 import android.os.Looper;
 import android.os.Trace;
+import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
@@ -26,6 +27,7 @@ public class MethodTrace {
             synchronized (methodList) {
                 methodList.add(new Entity(name, System.currentTimeMillis(), true, isInMainThread()));
             }
+        Log.d("MethodTrace", "method Name : " + name);
 //        }
     }
 

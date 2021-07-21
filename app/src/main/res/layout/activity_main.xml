@@ -12,8 +12,7 @@
         android:id="@+id/btn_click"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="click"
-        android:visibility="gone"/>
+        android:text="click"/>
 
     <RelativeLayout
         android:layout_width="match_parent"

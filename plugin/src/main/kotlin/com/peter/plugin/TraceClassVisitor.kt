@@ -38,12 +38,21 @@ class TraceClassVisitor (api : Int, cv : ClassVisitor?, var traceConfig : Config
 
         //是否是配置的需要插桩的类
         name?.let { className ->
+            if (className.contains("com/example/kotlinapp")) {
+                println("******************************** TrackClass : ${className}")
+            }
             isConfigTraceClass = traceConfig.isConfigTraceClass(className)
         }
 
         val isNotNeedTraceClass = isABSClass || isBeatClass || !isConfigTraceClass
         if (traceConfig.mIsNeedLogTraceInfo && !isNotNeedTraceClass) {
             println("MethodTraceMan-trace-class: ${className ?: "未知"}")
+        }
+
+        if(isConfigTraceClass) {
+            println("******************************** TrackClass : ${className}")
+        } else {
+            println("******************************** Not TrackClass : ${className}")
         }
     }
 
