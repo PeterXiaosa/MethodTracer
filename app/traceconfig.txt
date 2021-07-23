@@ -5,7 +5,7 @@
 -keeppackage com/peter/monitor
 -keeppackage android/support/
 -keeppackage androidx/
-%-keeppackage kotlin/
+-keeppackage kotlin/
 -keeppackage kotlinx/
 -keeppackage com/google/
 
