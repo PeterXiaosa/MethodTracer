@@ -12,13 +12,13 @@
         android:id="@+id/btn_click"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="click"/>
+        android:text="collect"/>
 
     <Button
         android:id="@+id/btn_click2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="click"/>
+        android:text="cost"/>
 
     <RelativeLayout
         android:layout_width="match_parent"

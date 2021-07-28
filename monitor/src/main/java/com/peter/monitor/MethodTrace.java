@@ -41,10 +41,14 @@ public class MethodTrace {
 
     public static void startCollectMethodCost() {
         List<MethodInfo> list = obtainMethodCostData();
-        for (MethodInfo info : list) {
-            if (info.getCostTime() > COST_TIME) {
-                Log.d("MethodTrace", " \n【***************************************************\n method Name : " + info.getName() + ", \n cost time : " + info.getCostTime() + "ms"
-                        + "\n ***************************************************】");
+        if (list == null || list.size() == 0) {
+            Log.d("MethodTrace", "cannot get enough method info");
+        } else {
+            for (MethodInfo info : list) {
+                if (info.getCostTime() > COST_TIME) {
+                    Log.d("MethodTrace", " \n【***************************************************\n method Name : " + info.getName() + ", \n cost time : " + info.getCostTime() + "ms"
+                            + "\n ***************************************************】");
+                }
             }
         }
         resetTraceManData();
