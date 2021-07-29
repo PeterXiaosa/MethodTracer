@@ -20,26 +20,39 @@ import java.util.List;
 public class MethodTrace {
     private final static String TAG = "MethodTrace";
     private static final List<Entity> methodList = new LinkedList<>();
+    private static boolean mIsTraceMethod = false;
 
     private final static long COST_TIME = 1000L;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public static void start(String name) {
-        Trace.beginSection(name);
-        synchronized (methodList) {
-            methodList.add(new Entity(name, System.currentTimeMillis(), true, isInMainThread()));
+        if (mIsTraceMethod) {
+            Trace.beginSection(name);
+            synchronized (methodList) {
+                methodList.add(new Entity(name, System.currentTimeMillis(), true, isInMainThread()));
+            }
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public static void end(String name) {
-        Trace.endSection();
-        synchronized (methodList) {
-            methodList.add(new Entity(name, System.currentTimeMillis(), false, isInMainThread()));
+        if (mIsTraceMethod) {
+            Trace.endSection();
+            synchronized (methodList) {
+                methodList.add(new Entity(name, System.currentTimeMillis(), false, isInMainThread()));
+            }
         }
     }
 
-    public static void startCollectMethodCost() {
+    public static void startCollect() {
+        mIsTraceMethod = true;
+    }
+
+    public static void endCollect() {
+        mIsTraceMethod = false;
+    }
+
+    public static void getCollectMethodCost() {
         List<MethodInfo> list = obtainMethodCostData();
         if (list == null || list.size() == 0) {
             Log.d("MethodTrace", "cannot get enough method info");
@@ -57,7 +70,7 @@ public class MethodTrace {
     /**
      * 处理插桩数据，按顺序获取所有方法耗时
      */
-    public static List<MethodInfo> obtainMethodCostData() {
+    private static List<MethodInfo> obtainMethodCostData() {
         synchronized (methodList) {
             List<MethodInfo> resultList = new ArrayList();
             for (int i = 0; i < methodList.size(); i++) {
