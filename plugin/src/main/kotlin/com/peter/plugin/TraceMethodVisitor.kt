@@ -25,7 +25,7 @@ class TraceMethodVisitor(api: Int, mv: MethodVisitor?, access: Int, name: String
         mv.visitMethodInsn(
             INVOKESTATIC,
             traceConfig.mBeatClass,
-            "start",
+            "onMethodStart",
             "(Ljava/lang/String;)V",
             false
         )
@@ -40,7 +40,7 @@ class TraceMethodVisitor(api: Int, mv: MethodVisitor?, access: Int, name: String
         mv.visitMethodInsn(
             INVOKESTATIC,
             traceConfig.mBeatClass,
-            "end",
+            "onMethodEnd",
             "(Ljava/lang/String;)V",
             false
         )

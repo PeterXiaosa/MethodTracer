@@ -12,6 +12,7 @@ import com.peter.monitor.bean.MethodInfo;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Peter Fu
@@ -24,23 +25,28 @@ public class MethodTrace {
 
     private final static long COST_TIME = 1000L;
 
+    private final static Object obj = new Object();
+
+    private static final ConcurrentHashMap<String, Entity> map = new ConcurrentHashMap<>();
+
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    public static void start(String name) {
-        if (mIsTraceMethod) {
-            Trace.beginSection(name);
-            synchronized (methodList) {
-                methodList.add(new Entity(name, System.currentTimeMillis(), true, isInMainThread()));
-            }
-        }
+    public static void onMethodStart(String name) {
+        map.put(name, new Entity(name, System.currentTimeMillis(), true, isInMainThread()));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    public static void end(String name) {
-        if (mIsTraceMethod) {
-            Trace.endSection();
-            synchronized (methodList) {
-                methodList.add(new Entity(name, System.currentTimeMillis(), false, isInMainThread()));
+    public static void onMethodEnd(String name) {
+        Entity entity = map.get(name);
+        if (entity != null) {
+            long nowTime = System.currentTimeMillis();
+            long costTime = nowTime - entity.time;
+            if (costTime > COST_TIME) {
+                Log.d(TAG, " \n【***************************************************\n 方法名(Method Name) : " + name
+                        + ", \n 耗时(Cost Time) : " + costTime + "ms"
+                        +", \n 是否主线程(Is In MainThread) : " + isInMainThread()
+                        + "\n ***************************************************】");
             }
+            map.remove(name);
         }
     }
 
@@ -53,40 +59,56 @@ public class MethodTrace {
     }
 
     public static void getCollectMethodCost() {
-        List<MethodInfo> list = obtainMethodCostData();
-        if (list == null || list.size() == 0) {
-            Log.d("MethodTrace", "cannot get enough method info");
-        } else {
-            for (MethodInfo info : list) {
-                if (info.getCostTime() > COST_TIME) {
-                    Log.d("MethodTrace", " \n【***************************************************\n method Name : " + info.getName() + ", \n cost time : " + info.getCostTime() + "ms"
-                            + "\n ***************************************************】");
+        new Thread(() -> {
+            Log.d(TAG, "thread start to collect");
+            List<Entity> tempList;
+            synchronized (obj) {
+                tempList = new LinkedList<>(methodList);
+//                resetTraceManData();
+                methodList.clear();
+            }
+            List<MethodInfo> list = obtainMethodCostData(tempList);
+            if (list.size() == 0) {
+                Log.d(TAG, "cannot get enough method info");
+            } else {
+                for (MethodInfo info : list) {
+                    if (info.getCostTime() > COST_TIME) {
+                        Log.d(TAG, " \n【***************************************************\n method Name : " + info.getName() + ", \n cost time : " + info.getCostTime() + "ms"
+                                + "\n ***************************************************】");
+                    }
                 }
             }
-        }
-        resetTraceManData();
+//            resetTraceManData();
+            Log.d(TAG, "thread end to collect");
+        }).start();
     }
 
     /**
      * 处理插桩数据，按顺序获取所有方法耗时
      */
-    private static List<MethodInfo> obtainMethodCostData() {
-        synchronized (methodList) {
-            List<MethodInfo> resultList = new ArrayList();
-            for (int i = 0; i < methodList.size(); i++) {
-                Entity startEntity = methodList.get(i);
-                if (!startEntity.isStart) {
-                    continue;
-                }
-                startEntity.pos = i;
-                Entity endEntity = findEndEntity(startEntity.name, i + 1);
+    private static List<MethodInfo> obtainMethodCostData(List<Entity> entityList) {
+//        synchronized (methodList) {
+        Log.d(TAG, "entityList size : " + entityList.size());
+        List<MethodInfo> resultList = new ArrayList();
+        for (int i = 0; i < entityList.size(); i++) {
+            Entity startEntity = entityList.get(i);
+            if (!startEntity.isStart) {
+                continue;
+            }
+            startEntity.pos = i;
+            Entity endEntity = findEndEntity(entityList, startEntity.name, i + 1);
 
-                if (endEntity != null && endEntity.time - startEntity.time > 0) {
-                    resultList.add(createMethodInfo(startEntity, endEntity));
+            if (endEntity != null && endEntity.time - startEntity.time > 0) {
+                MethodInfo methodInfo = createMethodInfo(startEntity, endEntity);
+                resultList.add(methodInfo);
+                if (methodInfo.getCostTime() > COST_TIME) {
+                    Log.d(TAG, " \n【***************************************************\n method Name : " + methodInfo.getName() + ", \n cost time : " + methodInfo.getCostTime() + "ms"
+                            + "\n ***************************************************】");
                 }
             }
-            return resultList;
         }
+        return resultList;
+//        }
     }
 
     /**
@@ -96,10 +118,10 @@ public class MethodTrace {
      * @param startPos
      * @return
      */
-    private static Entity findEndEntity(String name, int startPos) {
+    private static Entity findEndEntity(List<Entity> entityList, String name, int startPos) {
         int sameCount = 1;
-        for (int i = startPos; i < methodList.size(); i++) {
-            Entity endEntity = methodList.get(i);
+        for (int i = startPos; i < entityList.size(); i++) {
+            Entity endEntity = entityList.get(i);
             if (endEntity.name.equals(name)) {
                 if (endEntity.isStart) {
                     sameCount++;
