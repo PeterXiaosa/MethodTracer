@@ -14,3 +14,5 @@
 
 #插桩代码所在类,这里固定配置为：cn/cxzheng/tracemanui/TraceMan
 -beatclass com/peter/monitor/MethodTrace
+
+-costtime 500

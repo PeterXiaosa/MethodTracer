@@ -34,13 +34,29 @@ public class MethodTrace {
         map.put(name, new Entity(name, System.currentTimeMillis(), true, isInMainThread()));
     }
 
+//    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
+//    public static void onMethodEnd(String name) {
+//        Entity entity = map.get(name);
+//        if (entity != null) {
+//            long nowTime = System.currentTimeMillis();
+//            long costTime = nowTime - entity.time;
+//            if (costTime > COST_TIME) {
+//                Log.d(TAG, " \n【***************************************************\n 方法名(Method Name) : " + name
+//                        + ", \n 耗时(Cost Time) : " + costTime + "ms"
+//                        +", \n 是否主线程(Is In MainThread) : " + isInMainThread()
+//                        + "\n ***************************************************】");
+//            }
+//            map.remove(name);
+//        }
+//    }
+
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    public static void onMethodEnd(String name) {
+    public static void onMethodEnd(String name, Long value) {
         Entity entity = map.get(name);
         if (entity != null) {
             long nowTime = System.currentTimeMillis();
             long costTime = nowTime - entity.time;
-            if (costTime > COST_TIME) {
+            if (costTime > value) {
                 Log.d(TAG, " \n【***************************************************\n 方法名(Method Name) : " + name
                         + ", \n 耗时(Cost Time) : " + costTime + "ms"
                         +", \n 是否主线程(Is In MainThread) : " + isInMainThread()

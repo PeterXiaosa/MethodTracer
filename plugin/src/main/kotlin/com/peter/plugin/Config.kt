@@ -32,6 +32,8 @@ class Config {
     //是否需要打印出所有被插桩的类和方法
     var mIsNeedLogTraceInfo = false
 
+    var costTime : Long? = 1000L
+
     fun isNeedTraceClass(fileName : String) : Boolean {
         var isNeed = true
         if (fileName.endsWith(".class")) {
@@ -148,6 +150,11 @@ class Config {
                         config = config.replace("-beatclass ", "")
                         mBeatClass = config
                         System.out.println("beatclass:$config")
+                    }
+                    config.startsWith("-costtime ") -> {
+                        config = config.replace("-costtime ", "")
+                        costTime = config.toLong()
+                        System.out.println("costtime:$config")
                     }
                     else -> {
                     }

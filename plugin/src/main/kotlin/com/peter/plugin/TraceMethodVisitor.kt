@@ -37,11 +37,20 @@ class TraceMethodVisitor(api: Int, mv: MethodVisitor?, access: Int, name: String
 
     override fun onMethodExit(opcode: Int) {
         mv.visitLdcInsn(generatorMethodName())
+        mv.visitLdcInsn(traceConfig.costTime)
+        mv.visitMethodInsn(
+                INVOKESTATIC,
+                "java/lang/Long",
+                "valueOf",
+                "(J)Ljava/lang/Long;",
+                false
+        )
+
         mv.visitMethodInsn(
             INVOKESTATIC,
             traceConfig.mBeatClass,
             "onMethodEnd",
-            "(Ljava/lang/String;)V",
+            "(Ljava/lang/String;Ljava/lang/Long;)V",
             false
         )
     }
